@@ -18,11 +18,10 @@ fi
 sleep 3
 
 echo "###########################################"
-echo "Please enter path to locate Faceplate! 
+echo "Please enter path to locate Faceplate in recomended path! 
 #########################################
-# ***RECOMENDED: /mnt/DATA/fp-pool/!*** #
+#*** RECOMENDED: /mnt/DATA/fp-pool/   **#
 #########################################
-
 **In other case please change **/etc/systemd/system/fp.service**"
 
 sleep 2
@@ -57,7 +56,6 @@ ExecStart=/bin/bash /mnt/DATA/fp-pool/faceplate/bin/faceplate foreground
 ExecStop=/mnt/DATA/fp-pool/faceplate/bin/faceplate foreground
 #Restart=always
 #RestartSec=5s
-
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -104,3 +102,18 @@ fi
 
 
 
+Footer
+© 2023 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Fp/script.sh at main · Marlen1988/Fp
