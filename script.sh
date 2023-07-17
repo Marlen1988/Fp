@@ -1,28 +1,39 @@
 #!/bin/bash
 
-echo "Would you like to change hostname? yes/no"
+echo " Хотите поменять название хоста и IP адрес? Напишите да/нет, пожалуйста"
 
 read VAR3
-VAR1="no"
-VAR2="yes"
+VAR1="нет"
+VAR2="да"
 
 if [ "$VAR3" = "$VAR2" ]; then
-    echo "Please define hostname! For example srv1"
-    read VAR4
-    sudo hostnamectl set-hostname $VAR4
-     hostnamectl
+    echo "Укажите новое название хоста! РЕКОМЕНДОВАНО *master.fp* или *slave.fp*"
+    echo "Укажите название хоста Вашего ПК:"
+    read -r VAR4
+
+sudo hostnamectl set-hostname  $VAR4
+	hostnamectl
+echo "********************************************************"	
+echo "Укажите IP адрес ДРУГОЙ *FACEPLATE* ноды :"
+     echo "Укажите IP:"
+read -r VAR5
+echo "Укажите название ДРУГОЙ *FACEPLATE* ноды :"
+read -r VAR6
+sudo sed -i "1s/^/$VAR5   $VAR6\n/" /etc/hosts
+
 else
-    echo "Host name not changed"
+    echo "Название хоста не изменено"
     hostnamectl
 fi
 sleep 3
+echo "*/etc/hosts* файл изменен"
 
 echo "###########################################"
-echo "Please enter path to locate Faceplate in recomended path! 
+echo "Пожалуйста, укажите путь для размещения Faceplate!
 #########################################
-#*** RECOMENDED: /mnt/DATA/fp-pool/   **#
+# ***РЕКОМЕНДОВАНО: /mnt/DATA/fp-pool/ *** #
 #########################################
-**In other case please change **/etc/systemd/system/fp.service**"
+**В другом случае, пожалуйста, поменяйте **/etc/systemd/system/fp.service**"
 
 sleep 2
 
@@ -30,9 +41,9 @@ read path
 mkdir -p $path
 DIR=$path
 if [ -d "$DIR" ]; then
-    echo "$DIR Directory created sucsessfully!"
+    echo "$DIR Директория успешно создана!"
 else 
-    echo "$DIR Directory does not exist."
+    echo "$DIR Директории не существует."
 fi
 echo "Copy in progres..."
 sleep 2
@@ -42,6 +53,34 @@ cp -R $PWD $path
 
 
 sleep 2
+echo "########################################################"
+echo "Хотите запустить как Master? Напишите да/нет"
+echo "выберите *да* чтобы запустить как *Master*"
+echo "choose *нет* чтобы запустить как *Slave*"
+read ms3
+ms1="нет"
+ms2="да"
+
+if [ "$ms3" = "$ms1" ]; then
+
+# Найти путь к файлу vm.args внутри проекта
+file_path=$(find "$PWD" -name "vm.args" -type f)
+echo "$file_path"
+
+# Проверить, что файл найден
+if [[ -f "$file_path" ]]; then
+    sed -i "s/-name fp@master.fp/-name fp@slave.fp/g" "$file_path"
+    
+    echo "файл vm.args изменен!"
+else
+    echo "файл vm.args не найден"
+    sleep 2
+     echo "Данный ПК - *Master*"
+fi
+fi
+sleep 3
+
+
 
 cat > /etc/systemd/system/fp.service <<  EOF 
 [Unit] 
@@ -50,6 +89,7 @@ Description=Faceplate service
 WorkingDirectory=/mnt/DATA/fp-pool/faceplate
 Type=simple
 Environment="HOME=/mnt/DATA/fp-pool/faceplate"
+Environment="FORCE_START=true"
 RemainAfterExit=true
 LimitNOFILE=200000
 ExecStart=/bin/bash /mnt/DATA/fp-pool/faceplate/bin/faceplate foreground
@@ -62,26 +102,26 @@ EOF
 FILE=/etc/systemd/system/fp.service 
 
 if [ -f "$FILE" ]; then
-    echo "$FILE  file fp.service  created sucsessfully!"
+    echo "$FILE  файл fp.service успешно создан!"
 else 
-    echo "$FILE does not exist!Please check path"
+    echo "$FILE файл не существует! Пожалуйста, проверьте путь"
 fi
 
 chmod +x /etc/systemd/system/fp.service
 
-echo "Enabling fp.service..."
+echo "Включение fp.service..."
 sudo systemctl enable fp.service
-echo "fp.service in enable mode!"
+echo "fp.service во включенном режиме!"
 
 sleep 5
 
 chown -R user:user /mnt/DATA
 
-echo "Would you like to start Faceplate? yes/no"
+echo "Хотите запустить Faceplate? да/нет"
 
 read VAR7
-VAR5="no"
-VAR6="yes"
+VAR5="нет"
+VAR6="да"
 
 if [ "$VAR7" = "$VAR6" ]; then
    
@@ -90,13 +130,13 @@ if [ "$VAR7" = "$VAR6" ]; then
     sleep 30
      echo "
      ################
-     #**fp started**#
+     #**fp запущен**#
      ################
      
-     To stop faceplate please type 
+     Чтобы остановить faceplate напишите 
      **systemctl stop fp**"
 else
-    echo "**Thanks all configuration finished!**"
+    echo "**Все конфигурации окончены. Спасибо!**"
 
 fi
 
