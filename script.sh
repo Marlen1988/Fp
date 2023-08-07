@@ -126,17 +126,24 @@ VAR6="да"
 if [ "$VAR7" = "$VAR6" ]; then
    
     
+    sudo systemctl stop fp
+	 sleep 15
     sudo systemctl start fp
-    sleep 30
+	sleep 30
+
      echo "
      ################
      #**fp запущен**#
      ################
+
+sleep 3
+$ sudo journalctl --vacuum-time=1years
+ echo "**Размер журнала логирования ограничен до 1года!!!**"
      
      Чтобы остановить faceplate напишите 
      **systemctl stop fp**"
 else
-    echo "**Все конфигурации окончены. Спасибо!**"
+    echo "**Установка и конфигурация FACEPLATE завершена!!!**"
 
 fi
 
